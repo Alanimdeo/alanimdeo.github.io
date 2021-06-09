@@ -39,7 +39,7 @@
         }
 
         function recognize() {
-            if (recognized) { location.href = '/'; }
+            if (recognized) { location.reload(); }
             recognized = true;
             document.getElementById('recognizeButton').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 분석 중...';
             document.getElementById('recognizeButton').disabled = true;
