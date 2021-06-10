@@ -117,7 +117,7 @@
                     }
                     if (players[i] != "0") {
                         if (i < 5) {
-                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.6 + add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td></tr>`;
+                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td class="text-danger">-${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td class="text-success">+${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td class="text-primary">${String(Number(players[i]) * 0.6 + add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td></tr>`;
                         } else {
                             if (document.getElementById('pcroom').checked) {
                                 add = Math.floor(Number(players[i]) * 0.12);
@@ -125,7 +125,7 @@
                             if (document.getElementById('topclass').checked) {
                                 add += Math.floor(Number(players[i]) * 0.08)
                             }
-                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.6 + add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td></tr>`;
+                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td class="text-danger">-${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td class="text-success">+${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td class="text-primary">${String(Number(players[i]) * 0.6 + add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td></tr>`;
                         }
                     }
                 }
@@ -135,6 +135,8 @@
                 document.getElementById('recognizeButton').innerHTML = '새로고침';
                 document.getElementById('recognizeButton').disabled = false;
                 document.getElementById('recognizeButtonTooltip').innerHTML = '한 번 사용하신 후에는 반드시 새로고침해야 합니다.';
+                document.getElementById('playertable').hidden = false;
+                document.getElementById('summary').hidden = false;
                 document.getElementById('table-total').innerHTML = `합계: ${String(total).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP`;
                 document.getElementById('table-top5').innerHTML = `상위 선수 5명 30% 적용: ${String(total + ((Number(players[0]) + Number(players[1]) + Number(players[2]) + Number(players[3]) + Number(players[4])) * 0.12)).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP`;
             })();
@@ -149,9 +151,9 @@
         <!-- 공통 내비게이션 바 -->
         <div class="container">
             <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <a href="/fo4-taxcalculator" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
                     <img src="res/logo.jfif" width="32" height="32">
-                    <span class="fs-4">&nbsp;피파4 수수료 계산기</span>
+                    <span class="fs-4 ms-2">피파4 수수료 계산기</span>
                 </a>
                 <ul class="nav nav-pills">
                     <li class="nav-item"><a href="https://alan.imdeo.kr" class="nav-link">홈</a></li>
@@ -222,13 +224,13 @@
                     <button type="button" id="recognizeButton" class="btn btn-primary" onclick="recognize()" disabled>분석</button>
                 </div>
                 <div class="col-auto">
-                    <p id="recognizeButtonTooltip"></p>
+                    <p id="recognizeButtonTooltip" style="margin-top: 0.375rem"></p>
                 </div>
             </div>
 
             <!-- 테이블 -->
-            <table id="playertable" class="table table-hover">
-                <thead class="table-light">
+            <table id="playertable" class="table table-striped table-bordered" hidden>
+                <thead class="table-light border-dark">
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">선수 가격</th>
@@ -240,13 +242,15 @@
 
                 <tbody></tbody>
 
+                <tfoot class="text-dark"></tfoot>
+
                 <caption>위의 표에서는 사진에 나온 선수(최대 8명)만 출력됩니다. 단, 합계는 정상적으로 출력됩니다.</caption>
             </table>
 
             <!-- 합계 텍스트 -->
-            <div class="row g-1 mb-4">
-            <b id="table-total">합계:</b>
-            <b id="table-top5">상위 선수 5명 30% 적용:</b>
+            <div id="summary" class="row g-1 mb-4" hidden>
+                <b id="table-total">합계:</b>
+                <b id="table-top5">상위 선수 5명 30% 적용:</b>
             </div>
             
             <!-- 이미지 토글 -->
@@ -263,4 +267,4 @@
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     </body>
-    </html>
+</html>
