@@ -8,51 +8,68 @@
         <link rel="icon" href="res/logo.jfif">
     </head>
     <script>
-        let recognized = false;
+        // 사진 로딩
+        function loadFile(item) {
+            var reader = new FileReader();
+            reader.readAsDataURL(item);
+            var urlCreator = window.URL || window.webkitURL;
+            var imageUrl = urlCreator.createObjectURL(item);
+            var img = document.getElementById("image");
+            img.src = imageUrl;
+            document.getElementById('recognizeButton').disabled = false;
+            document.getElementById('imageloaded').innerHTML = '사진: 로딩됨!';
+            document.getElementById('uploadButton').className += ' d-none';
+        }
 
+        // 사이트 로딩 완료 이벤트
         document.addEventListener('DOMContentLoaded', function() {
-            console.log(window.location.hostname);
+
+            // 미러 페이지일 경우 내비게이션 바 수정
             if (window.location.hostname != 'files.alan.imdeo.kr') {
                 var menu = document.getElementById('menu_page');
                 menu.innerHTML = '원본 페이지';
                 menu.href = 'https://files.alan.imdeo.kr/fo4-taxcalculator';
             }
+
+            // 파일 업로드 이벤트
+            const file = document.getElementById('uploadImage');
+            // console.log(file);
+            file.addEventListener('change', (event) => {
+                let item = event.target.files[0];
+                if (item.type.startsWith('image/')) { loadFile(item) }
+            });
         }, false);
 
-        document.onpaste = function(event){
+        // 붙여넣기 이벤트
+        document.onpaste = function(event) {
             var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            console.log(JSON.stringify(items)); // will give you the mime types
+            // console.log(JSON.stringify(items));
             for (index in items) {
                 var item = items[index];
-                if (item.kind === 'file') {
-                    var blob = item.getAsFile();
-                    var reader = new FileReader();
-                    reader.readAsDataURL(blob);
-                    var urlCreator = window.URL || window.webkitURL;
-                    var imageUrl = urlCreator.createObjectURL(blob);
-                    var img = document.getElementById("image");
-                    img.src = imageUrl;
-                    document.getElementById('recognizeButton').disabled = false;
-                    document.getElementById('imageloaded').innerHTML = '사진: 로딩됨!';
-                }
+                if (item.kind === 'file') { loadFile(item.getAsFile()) }
             }
         }
 
+        // OCR
+        let recognized = false;
         function recognize() {
             if (recognized) { location.reload(); }
             recognized = true;
             document.getElementById('recognizeButton').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 분석 중...';
             document.getElementById('recognizeButton').disabled = true;
-            const { createWorker } = Tesseract;
             var img = document.getElementById('image');
+            const { createWorker } = Tesseract;
             const worker = createWorker();
             const rectangles = [
+                // 합계 부분
                 {
                     left: Math.floor(img.clientWidth * 0.6975),
                     top: Math.floor(img.clientHeight * 0.779),
                     width: Math.floor(img.clientWidth / 3.7615),
                     height: Math.floor(img.clientHeight / 15.6),
                 },
+
+                // 선수 판매 금액 부분
                 {
                     left: Math.floor(img.clientWidth * 0.3086),
                     top: Math.floor(img.clientHeight * 0.1659),
@@ -60,8 +77,8 @@
                     height: Math.floor(img.clientHeight / 1.82),
                 },
             ];
-            console.log('크기 값 설정:')
-            console.log(rectangles);
+            // console.log('크기 값 설정:');
+            // console.log(rectangles);
             (async () => {
                 await worker.load();
                 await worker.loadLanguage('kor');
@@ -75,8 +92,8 @@
                     values.push(text);
                 }
                 values = { total: values[0].replace('\n', ''), players: values[1] };
-                console.log('OCR 결과:');
-                console.log(values);
+                // console.log('OCR 결과:');
+                // console.log(values);
                 await worker.terminate();
                 let players = values.players.replaceAll('\n\n', '\n');
                 players = players.split('\n');
@@ -85,7 +102,7 @@
                 let tbody = '';
                 let total = 0;
                 if (document.getElementById('pcroom').checked) {
-                    console.log('PC방 체크됨');
+                    // console.log('PC방 체크됨');
                     total = Math.floor(Number(values.total) * 20 / 17);
                 } else {
                     total = Number(values.total);
@@ -112,7 +129,7 @@
                         }
                     }
                 }
-                console.log(`개별 선수 상위 7명: ${players}`);
+                // console.log(`개별 선수 상위 7명: ${players}`);
                 let pt = document.getElementById('playertable');
                 pt.innerHTML = pt.innerHTML.replace('<tbody>', `<tbody>${tbody}`);
                 document.getElementById('recognizeButton').innerHTML = '새로고침';
@@ -123,11 +140,13 @@
             })();
         }
 
+        // 이미지 보이기/숨기기
         function changeImageStatus() {
             if (document.getElementById('imageCheck').checked) { document.getElementById('image').style='visibility: visible;' } else { document.getElementById('image').style='visibility: hidden;' }
         }
     </script>
     <body>
+        <!-- 공통 내비게이션 바 -->
         <div class="container">
             <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
                 <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
@@ -141,6 +160,8 @@
                 </ul>
             </header>
         </div>
+
+        <!-- 사용 방법 모달 -->
         <div class="modal fade" id="howToModal" tabindex="-1" aria-labelledby="howToModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -160,22 +181,43 @@
                 </div>
             </div>
         </div>
+
+        <!-- 메인 컨테이너 -->
         <div class="container">
             <h1>피파 온라인 4 수수료 계산기</h1>
             <p>TOP 클래스가 적용되어 있을 경우 TOP 클래스가 적용된 가격으로 계산됩니다.</p>
-            <h5><b id="imageloaded">사진:</b></h5>
-            <div class="mb-3">
-                <label for="pcroom" class="form-label">혜택</label>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="topclass" checked>
-                    <label class="form-check-label align-top" for="topclass">TOP 클래스</label>
+
+            <!-- 사진 업로드 상태 -->
+            <div class="row mt-4 mb-4">
+                <div class="col-auto">
+                    <h4><b id="imageloaded">사진: 붙여넣기 또는</b></h4>
                 </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="pcroom">
-                    <label class="form-check-label align-top" for="pcroom">PC방 혜택 적용</label>
+                <div class="col-auto ps-0">
+                    <label id="uploadButton" class="btn btn-secondary btn-sm">
+                        사진 업로드 <input type="file" id="uploadImage" accept="image/*" hidden>
+                    </label>
                 </div>
             </div>
-            <div class="row g-3">
+
+            <!-- 혜택 체크박스 -->
+            <div class="row mb-4">
+                <h5 class="row-auto mb-2"><b>혜택</b></h5>
+                <div class="col-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="topclass" checked>
+                        <label class="form-check-label align-top" for="topclass">TOP 클래스</label>
+                    </div>
+                </div>
+                <div class="col-auto ps-0">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="pcroom" checked>
+                        <label class="form-check-label align-top" for="pcroom">PC방 혜택 적용</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 분석 버튼 -->
+            <div class="row g-3 mb-4">
                 <div class="col-auto">
                     <button type="button" id="recognizeButton" class="btn btn-primary" onclick="recognize()" disabled>분석</button>
                 </div>
@@ -183,7 +225,8 @@
                     <p id="recognizeButtonTooltip"></p>
                 </div>
             </div>
-            <br>
+
+            <!-- 테이블 -->
             <table id="playertable" class="table table-hover">
                 <thead class="table-light">
                     <tr>
@@ -194,19 +237,29 @@
                         <th scope="col">합계</th>
                     </tr>
                 </thead>
+
                 <tbody></tbody>
+
                 <caption>위의 표에서는 사진에 나온 선수(최대 8명)만 출력됩니다. 단, 합계는 정상적으로 출력됩니다.</caption>
             </table>
-            <b id="table-total">합계:</b><br>
-            <b id="table-top5">상위 선수 5명 30% 적용:</b><br>
-            <br>
+
+            <!-- 합계 텍스트 -->
+            <div class="row g-1 mb-4">
+            <b id="table-total">합계:</b>
+            <b id="table-top5">상위 선수 5명 30% 적용:</b>
+            </div>
+            
+            <!-- 이미지 토글 -->
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="imageCheck" onclick="changeImageStatus()">
                 <label class="form-check-label align-top" for="pcroom">이미지 보기</label>
             </div>
+
+            <!-- 하단 이미지 -->
             <img id="image" style="visibility: hidden;">
-            <br><br>
-            <footer class="text-center">&copy; 2021 Alanimdeo</footer>
+
+            <!-- 푸터 -->
+            <footer class="text-center mt-4">&copy; 2021 Alanimdeo</footer>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     </body>
