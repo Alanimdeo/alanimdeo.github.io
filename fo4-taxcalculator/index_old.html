@@ -54,9 +54,9 @@
                     height: Math.floor(img.clientHeight / 15.6),
                 },
                 {
-                    left: Math.floor(img.clientWidth * 0.3086),
+                    left: Math.floor(img.clientWidth * 0.3334),
                     top: Math.floor(img.clientHeight * 0.1659),
-                    width: Math.floor(img.clientWidth / 9.0667),
+                    width: Math.floor(img.clientWidth / 12),
                     height: Math.floor(img.clientHeight / 1.82),
                 },
             ];
@@ -78,8 +78,7 @@
                 console.log('OCR 결과:');
                 console.log(values);
                 await worker.terminate();
-                let players = values.players.replaceAll('\n\n', '\n');
-                players = players.split('\n');
+                let players = values.players.split('\n');
                 players.pop();
                 players.push('0', '0', '0', '0');
                 let tbody = '';
@@ -100,7 +99,7 @@
                     }
                     if (players[i] != "0") {
                         if (i < 5) {
-                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.6 + add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td></tr>`;
+                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td></td></tr>`;
                         } else {
                             if (document.getElementById('pcroom').checked) {
                                 add = Math.floor(Number(players[i]) * 0.12);
@@ -108,7 +107,7 @@
                             if (document.getElementById('topclass').checked) {
                                 add += Math.floor(Number(players[i]) * 0.08)
                             }
-                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.6 + add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td></tr>`;
+                            tbody += `<tr><th scope="row">${i + 1}</th><td>${players[i].replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(Number(players[i]) * 0.4).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td>${String(add).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")} BP</td><td></td></tr>`;
                         }
                     }
                 }
@@ -128,6 +127,7 @@
         }
     </script>
     <body>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
         <div class="container">
             <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
                 <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
@@ -135,31 +135,31 @@
                     <span class="fs-4">&nbsp;피파4 수수료 계산기</span>
                 </a>
                 <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="https://alan.imdeo.kr" class="nav-link">홈</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#howToModal">사용 방법</a></li>
-                    <li class="nav-item"><a id="menu_page" href="https://alanimdeo.github.io/fo4-taxcalculator" class="nav-link">백업 페이지</a></li>
+                <li class="nav-item"><a href="https://alan.imdeo.kr" class="nav-link">홈</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#howToModal">사용 방법</a></li>
+                <li class="nav-item"><a id="menu_page" href="https://alanimdeo.github.io/fo4-taxcalculator" class="nav-link">백업 페이지</a></li>
                 </ul>
             </header>
         </div>
         <div class="modal fade" id="howToModal" tabindex="-1" aria-labelledby="howToModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="howToModalLabel">사용 방법</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>이적시장에서 <img src="res/collecAll.png" height=30>를 누른 후 가운데 나오는 흰색 창을 캡쳐해서 붙여넣기 하세요.</p>
-                        <p><b>반드시!</b> 피파 창 전체가 아닌 내부의 창을 캡쳐하셔야 합니다.</p>
-                        <p>예시:</p>
-                        <img src="res/capture.png" width=100%>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
-                    </div>
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="howToModalLabel">사용 방법</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body">
+                    <p>이적시장에서 <img src="res/collecAll.png" height=30>를 누른 후 가운데 나오는 흰색 창을 캡쳐해서 붙여넣기 하세요.</p>
+                    <p><b>반드시!</b> 피파 창 전체가 아닌 내부의 창을 캡쳐하셔야 합니다.</p>
+                    <p>예시:</p>
+                    <img src="res/capture.png" width=100%>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+                </div>
+              </div>
             </div>
-        </div>
+          </div>
         <div class="container">
             <h1>피파 온라인 4 수수료 계산기</h1>
             <p>TOP 클래스가 적용되어 있을 경우 TOP 클래스가 적용된 가격으로 계산됩니다.</p>
@@ -195,7 +195,7 @@
                     </tr>
                 </thead>
                 <tbody></tbody>
-                <caption>위의 표에서는 사진에 나온 선수(최대 8명)만 출력됩니다. 단, 합계는 정상적으로 출력됩니다.</caption>
+                <caption>선수 계산에는 오류가 있을 수 있습니다. 단, 합계는 정상적으로 출력됩니다.</caption>
             </table>
             <b id="table-total">합계:</b><br>
             <b id="table-top5">상위 선수 5명 30% 적용:</b><br>
@@ -208,6 +208,5 @@
             <br><br>
             <footer class="text-center">&copy; 2021 Alanimdeo</footer>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     </body>
-    </html>
+</html>
